@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.agileintelligence.ppmtool.domain.Project;
 import io.agileintelligence.ppmtool.services.ProjectService;
+import io.agileintelligence.ppmtool.services.ValidationErrorService;
 
 @RestController
 @RequestMapping("api/project")
@@ -28,23 +29,15 @@ public class ProjectController {
 	
 	@Autowired
 	private ProjectService projectService;
+	@Autowired
+	private ValidationErrorService validationErrorService;
 	
 	 
 	@PostMapping("")
 	public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result){
 		
-		if(result.hasErrors()) {
-			
-			Map<String, String> errorMap = new HashMap<String, String>();
-			
-			for(FieldError flderr : result.getFieldErrors()) {
-				errorMap.put(flderr.getField(), flderr.getDefaultMessage());
-			}
-			
-			return new ResponseEntity<Map<String,String>>(errorMap, HttpStatus.BAD_REQUEST);
-			
-			//return new ResponseEntity<List<FieldError>>(result.getFieldErrors(), HttpStatus.BAD_REQUEST);
-		}
+		ResponseEntity<?> errorMap = validationErrorService.mapBasedValidationService(result);
+		if(errorMap!=null) return errorMap;
 		
 		Project project1 = projectService.saveorUpdateProject(project);
 		return new  ResponseEntity<Project>(project, HttpStatus.CREATED);
