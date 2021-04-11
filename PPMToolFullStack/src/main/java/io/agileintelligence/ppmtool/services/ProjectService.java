@@ -57,5 +57,16 @@ public class ProjectService {
 		projectRepository.delete(project);
 		
 	}
+	
+	public Project updateProjectModifications(Project project) {
+		
+		try {
+			project.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+			return projectRepository.save(project);
+		} catch (Exception e) {
+			throw new ProjectIdException("Project ID '"+ project.getProjectIdentifier().toUpperCase() +"' based Project cannot be updated.");
+		}
+		
+	}
 
 }

@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,6 +67,17 @@ public class ProjectController {
 		projectService.deleteProjectByIdentifier(projectId);
 		return new ResponseEntity<String>("Project with ID : '"+ projectId +"' was deleted successfully.", HttpStatus.OK);
 		
+	}
+	
+	@PatchMapping("/updateProject")
+	public ResponseEntity<?> updateProject(@Valid @RequestBody Project project, BindingResult result) {
+		
+		ResponseEntity<?> updateErrorMap = validationErrorService.mapBasedValidationService(result);
+		if(updateErrorMap!=null) return updateErrorMap;
+		
+		
+		projectService.updateProjectModifications(project);
+		return new ResponseEntity<Project>(project, HttpStatus.OK);
 	}
 	
 	
